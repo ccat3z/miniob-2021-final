@@ -41,7 +41,7 @@ RUN wget http://ftp.gnu.org/gnu/bison/bison-3.7.tar.gz \
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
 # Dev tools
-RUN apt-get update && apt-get install bash-completion gdb -y \
+RUN apt-get update && apt-get install bash-completion gdb vim -y \
     && rm -rf /var/lib/apt/lists/*
 RUN echo ". /etc/bash_completion" >> /etc/bash.bashrc
 RUN rm -rf /root/.gnupg
