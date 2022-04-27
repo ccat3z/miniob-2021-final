@@ -21,6 +21,7 @@ run_observer() {
     info "start observer..."
     cd $BUILD_DIR
     rm -rf $BUILD_DIR/miniob/db
+    cmake --build . --config Debug --target observer -- -j 14
     $OBSERVER &
     OBSERVER_PID=$!
     sleep 2s
@@ -50,4 +51,7 @@ fi
 sql "create table t1 (c1 int, c2 int, c3 int, v1 char, v2 char, v3 char, v4 char, v5 char, v6 char, v7 char, v8 char, v9 char);"
 sql "load data infile '$TEST_DIR/$TABLE_DATA' into table t1;"
 sql "create index i1 on t1(c2);"
+sql "sync;"
 sql "select * from t1 where c2 = 1;"
+du -h $BUILD_DIR/miniob/db/sys
+ls -lh $BUILD_DIR/miniob/db/sys
