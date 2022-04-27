@@ -39,7 +39,7 @@ typedef int PageNum;
 
 #define PAGE_FIRST_BLOCK_OFFSET 312
 #define PAGE_BLOCK_SIZE 56
-#define PAGE_COMPRESSED_BLOCK_SIZE 56
+#define PAGE_COMPRESSED_BLOCK_SIZE (sizeof(CompressedBlock))
 #define BP_PAGE_COMPRESSED_SIZE                                                            \
   (BP_PAGE_DATA_SIZE - ((BP_PAGE_DATA_SIZE - PAGE_FIRST_BLOCK_OFFSET) / PAGE_BLOCK_SIZE) * \
                            (PAGE_BLOCK_SIZE - PAGE_COMPRESSED_BLOCK_SIZE))
@@ -53,6 +53,17 @@ typedef struct {
 typedef struct {
   int delta_start;
 } CompressedMeta;
+
+typedef struct {
+  int __trx;
+  int c1;
+  char other[PAGE_BLOCK_SIZE - sizeof(int) * 2];
+} UncompressedBlock;
+
+typedef struct {
+  int __trx;
+  char other[PAGE_BLOCK_SIZE - sizeof(int) * 2];
+} CompressedBlock;
 
 typedef struct {
   PageNum page_num;
