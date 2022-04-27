@@ -722,7 +722,7 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page)
 
 RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
 {
-  comp_page->page_num = page->page_num;
+  page->page_num = comp_page->page_num;
   memcpy(page->data, comp_page->data, PAGE_FIRST_BLOCK_OFFSET);
   const int blocks_cap = (BP_PAGE_DATA_SIZE - PAGE_FIRST_BLOCK_OFFSET) / PAGE_BLOCK_SIZE;
 
@@ -731,7 +731,7 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
 
   for (int idx = 0; idx < blocks_cap; block += PAGE_BLOCK_SIZE, comp_block += PAGE_COMPRESSED_BLOCK_SIZE, ++idx) {
     memcpy(block, comp_block, PAGE_COMPRESSED_BLOCK_SIZE);
-    comp_block[0]--;  // compress demo
+    block[0]--;  // compress demo
   }
   return RC::SUCCESS;
 }
