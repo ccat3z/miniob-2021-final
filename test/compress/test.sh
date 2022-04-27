@@ -50,4 +50,4 @@ fi
 sql "create table t1 (c1 int, c2 int, c3 int, v1 char, v2 char, v3 char, v4 char, v5 char, v6 char, v7 char, v8 char, v9 char);"
 sql "load data infile '$TEST_DIR/$TABLE_DATA' into table t1;"
 sql "create index i1 on t1(c2);"
-sql "select * from t1 where c1 = 1;"
+sql "select * from t1 where c2 = 1;"
