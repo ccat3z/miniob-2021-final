@@ -174,7 +174,7 @@ RC DiskBufferPool::create_file(const char *file_name)
   return RC::SUCCESS;
 }
 
-RC DiskBufferPool::open_file(const char *file_name, int *file_id)
+RC DiskBufferPool::open_file(const char *file_name, int *file_id, bool compressed)
 {
   int fd, i, size = 0, empty_id = -1;
   // This part isn't gentle, the better method is using LRU queue.
@@ -214,6 +214,7 @@ RC DiskBufferPool::open_file(const char *file_name, int *file_id)
   file_handle->bopen = true;
   file_handle->file_name = strdup(file_name);
   file_handle->file_desc = fd;
+  file_handle->compressed = compressed;
   if ((tmp = allocate_page(&file_handle->hdr_frame)) != RC::SUCCESS) {
     LOG_ERROR("Failed to allocate block for %s's BPFileHandle.", file_name);
     delete file_handle;
@@ -224,6 +225,7 @@ RC DiskBufferPool::open_file(const char *file_name, int *file_id)
   file_handle->hdr_frame->file_desc = fd;
   file_handle->hdr_frame->pin_count = 1;
   file_handle->hdr_frame->acc_time = current_time();
+  file_handle->hdr_frame->file_id = empty_id;
   if ((tmp = load_page(0, file_handle, file_handle->hdr_frame)) != RC::SUCCESS) {
     LOG_ERROR("Failed to load first page of %s, due to %s.", file_name, strerror(errno));
     file_handle->hdr_frame->pin_count = 0;
@@ -306,6 +308,7 @@ RC DiskBufferPool::get_this_page(int file_id, PageNum page_num, BPPageHandle *pa
   page_handle->frame->file_desc = file_handle->file_desc;
   page_handle->frame->pin_count = 1;
   page_handle->frame->acc_time = current_time();
+  page_handle->frame->file_id = file_id;
   if ((tmp = load_page(page_num, file_handle, page_handle->frame)) != RC::SUCCESS) {
     LOG_ERROR("Failed to load page %s:%d", file_handle->file_name, page_num);
     page_handle->frame->pin_count = 0;
@@ -360,6 +363,7 @@ RC DiskBufferPool::allocate_page(int file_id, BPPageHandle *page_handle)
   page_handle->frame->file_desc = file_handle->file_desc;
   page_handle->frame->pin_count = 1;
   page_handle->frame->acc_time = current_time();
+  page_handle->frame->file_id = file_id;
   memset(&(page_handle->frame->page), 0, sizeof(Page));
   page_handle->frame->page.page_num = file_handle->file_sub_header->page_count - 1;
 
@@ -550,7 +554,7 @@ RC DiskBufferPool::purge_all_pages(BPFileHandle *file_handle)
 
 RC DiskBufferPool::flush_page(Frame *frame)
 {
-  if (frame->page.page_num < UNCOMPRESSED_PAGE_NUM) {
+  if (frame->page.page_num < UNCOMPRESSED_PAGE_NUM || !open_list_[frame->file_id]->compressed) {
     return flush_uncompressed_page(frame);
   }
 
@@ -661,7 +665,7 @@ RC DiskBufferPool::check_page_num(PageNum page_num, BPFileHandle *file_handle)
 
 RC DiskBufferPool::load_page(PageNum page_num, BPFileHandle *file_handle, Frame *frame)
 {
-  if (page_num < UNCOMPRESSED_PAGE_NUM) {
+  if (page_num < UNCOMPRESSED_PAGE_NUM || !file_handle->compressed) {
     return load_uncompressed_page(page_num, file_handle, frame);
   }
 

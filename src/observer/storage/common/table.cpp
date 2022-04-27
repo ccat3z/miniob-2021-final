@@ -344,7 +344,7 @@ RC Table::init_record_handler(const char *base_dir)
   }
 
   int data_buffer_pool_file_id;
-  RC rc = data_buffer_pool_->open_file(data_file.c_str(), &data_buffer_pool_file_id);
+  RC rc = data_buffer_pool_->open_file(data_file.c_str(), &data_buffer_pool_file_id, true);
   if (rc != RC::SUCCESS) {
     LOG_ERROR("Failed to open disk buffer pool for file:%s. rc=%d:%s", data_file.c_str(), rc, strrc(rc));
     return rc;

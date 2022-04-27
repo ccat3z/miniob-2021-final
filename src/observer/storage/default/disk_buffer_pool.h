@@ -69,6 +69,7 @@ typedef struct Frame_ {
   unsigned int pin_count;
   unsigned long acc_time;
   int file_desc;
+  int file_id;
   Page page;
 
   bool can_purge()
@@ -98,6 +99,7 @@ public:
   Page *hdr_page;
   char *bitmap;
   BPFileSubHeader *file_sub_header;
+  bool compressed = false;
 };
 
 class BPManager : public common::MemPoolSimple<Frame> {
@@ -144,7 +146,7 @@ public:
    * 根据文件名打开一个分页文件，返回文件ID
    * @return
    */
-  RC open_file(const char *file_name, int *file_id);
+  RC open_file(const char *file_name, int *file_id, bool compressed = false);
 
   /**
    * 关闭fileID对应的分页文件
