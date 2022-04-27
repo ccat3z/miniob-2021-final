@@ -679,7 +679,7 @@ RC DiskBufferPool::load_page(PageNum page_num, BPFileHandle *file_handle, Frame 
 
     return RC::IOERR_SEEK;
   }
-  if (read(file_handle->file_desc, &comp_page, sizeof(Page)) != sizeof(Page)) {
+  if (read(file_handle->file_desc, &comp_page, sizeof(CompressedPage)) != sizeof(CompressedPage)) {
     LOG_ERROR(
         "Failed to load page %s:%d, due to failed to read data:%s.", file_handle->file_name, page_num, strerror(errno));
     return RC::IOERR_READ;
