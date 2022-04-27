@@ -805,7 +805,7 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
     }
 
     // c3
-    comp_data->c3 = data->c3;
+    data->c3 = comp_data->c3;
 
     // v1
     memcpy(data->v1, comp_data->v1, sizeof(data->v1));

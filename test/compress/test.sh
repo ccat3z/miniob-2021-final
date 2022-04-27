@@ -53,5 +53,6 @@ sql "load data infile '$TEST_DIR/$TABLE_DATA' into table t1;"
 sql "create index i1 on t1(c2);"
 sql "sync;"
 sql "select * from t1 where c2 = 1;"
+sql "select * from t1 where c2 = 100;"
 du -h $BUILD_DIR/miniob/db/sys
 ls -lh $BUILD_DIR/miniob/db/sys
