@@ -702,15 +702,31 @@ RC DiskBufferPool::load_uncompressed_page(PageNum page_num, BPFileHandle *file_h
 RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page)
 {
   comp_page->page_num = page->page_num;
-  memcpy(comp_page->data, page->data, BP_PAGE_DATA_SIZE);
-  page->data[0]++;
+  memcpy(comp_page->data, page->data, PAGE_FIRST_BLOCK_OFFSET);
+  const int blocks_cap = (BP_PAGE_DATA_SIZE - PAGE_FIRST_BLOCK_OFFSET) / PAGE_BLOCK_SIZE;
+
+  char *block = page->data + PAGE_FIRST_BLOCK_OFFSET;
+  char *comp_block = comp_page->data + PAGE_COMPRESSED_BLOCK_SIZE;
+
+  for (int idx = 0; idx < blocks_cap; block += PAGE_BLOCK_SIZE, comp_block += PAGE_COMPRESSED_BLOCK_SIZE, ++idx) {
+    memcpy(comp_block, block, PAGE_COMPRESSED_BLOCK_SIZE);
+    comp_block[0]++;  // compress demo
+  }
   return RC::SUCCESS;
 }
 
 RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
 {
-  page->page_num = comp_page->page_num;
-  memcpy(page->data, comp_page->data, BP_PAGE_DATA_SIZE);
-  page->data[0]--;
+  comp_page->page_num = page->page_num;
+  memcpy(page->data, comp_page->data, PAGE_FIRST_BLOCK_OFFSET);
+  const int blocks_cap = (BP_PAGE_DATA_SIZE - PAGE_FIRST_BLOCK_OFFSET) / PAGE_BLOCK_SIZE;
+
+  char *block = page->data + PAGE_FIRST_BLOCK_OFFSET;
+  char *comp_block = comp_page->data + PAGE_COMPRESSED_BLOCK_SIZE;
+
+  for (int idx = 0; idx < blocks_cap; block += PAGE_BLOCK_SIZE, comp_block += PAGE_COMPRESSED_BLOCK_SIZE, ++idx) {
+    memcpy(block, comp_block, PAGE_COMPRESSED_BLOCK_SIZE);
+    comp_block[0]--;  // compress demo
+  }
   return RC::SUCCESS;
 }

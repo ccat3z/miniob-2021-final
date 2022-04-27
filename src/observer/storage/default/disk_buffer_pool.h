@@ -38,6 +38,10 @@ typedef int PageNum;
 #define MAX_OPEN_FILE 1024
 #define UNCOMPRESSED_PAGE_NUM 1
 
+#define PAGE_FIRST_BLOCK_OFFSET 312
+#define PAGE_BLOCK_SIZE 56
+#define PAGE_COMPRESSED_BLOCK_SIZE 56
+
 typedef struct {
   PageNum page_num;
   char data[BP_PAGE_DATA_SIZE];
@@ -46,6 +50,7 @@ typedef struct {
 
 typedef struct {
   PageNum page_num;
+  int delta_start;
   char data[BP_PAGE_COMPRESSED_SIZE];
 } CompressedPage;
 
