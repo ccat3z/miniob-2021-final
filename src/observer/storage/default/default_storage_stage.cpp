@@ -205,6 +205,8 @@ void DefaultStorageStage::handle_event(StageEvent *event)
       rc = handler_->create_index(
           current_trx, current_db, create_index.relation_name, create_index.index_name, create_index.attribute_name);
       snprintf(response, sizeof(response), "%s\n", rc == RC::SUCCESS ? "SUCCESS" : "FAILURE");
+      // Force sync after create index
+      DefaultHandler::get_default().sync();
     } break;
 
     case SCF_SHOW_TABLES: {
