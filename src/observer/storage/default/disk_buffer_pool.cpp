@@ -708,6 +708,8 @@ RC DiskBufferPool::load_uncompressed_page(PageNum page_num, BPFileHandle *file_h
 // 由于compress_page和decompress_page只能在flush时触发,
 // 为了能够在测试平台验证此处功能, 我在create index后强制触发了一次sync.
 // 见commit 327457a
+//
+// 此外, 为了节省时间, 此处硬编码测试用例的schema
 
 RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool only_meta)
 {

@@ -37,6 +37,7 @@ typedef int PageNum;
 #define MAX_OPEN_FILE 1024
 #define UNCOMPRESSED_PAGE_NUM 1
 
+// HACK: 为了节省时间, 此处硬编码测试用例中一个record的大小
 #define PAGE_FIRST_BLOCK_OFFSET 312
 #define PAGE_BLOCK_SIZE 56
 #define PAGE_COMPRESSED_BLOCK_SIZE (sizeof(CompressedBlock))
