@@ -20,7 +20,7 @@ info() {
 run_observer() {
     info "start observer..."
     cd $BUILD_DIR
-    rm -rf $BUILD_DIR/miniob
+    rm -rf $BUILD_DIR/miniob/db
     $OBSERVER &
     OBSERVER_PID=$!
     sleep 2s
