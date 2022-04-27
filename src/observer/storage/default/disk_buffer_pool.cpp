@@ -368,11 +368,11 @@ RC DiskBufferPool::allocate_page(int file_id, BPPageHandle *page_handle)
   page_handle->frame->page.page_num = file_handle->file_sub_header->page_count - 1;
 
   // Use flush operation to extension file
-  if ((tmp = flush_page(page_handle->frame)) != RC::SUCCESS) {
-    LOG_WARN("Failed to alloc page %s , due to failed to extend one page.", file_handle->file_name);
-    // skip return false, delay flush the extended page
-    // return tmp;
-  }
+  // if ((tmp = flush_page(page_handle->frame)) != RC::SUCCESS) {
+  //   LOG_WARN("Failed to alloc page %s , due to failed to extend one page.", file_handle->file_name);
+  //   // skip return false, delay flush the extended page
+  //   // return tmp;
+  // }
 
   page_handle->open = true;
   return RC::SUCCESS;
@@ -536,10 +536,11 @@ RC DiskBufferPool::purge_all_pages(BPFileHandle *file_handle)
   std::list<Frame *> used = bp_manager_.find_list(file_handle->file_desc);
   for (std::list<Frame *>::iterator it = used.begin(); it != used.end(); ++it) {
     Frame *frame = *it;
-    if (frame->pin_count > 0) {
-      LOG_WARN("The page has been pinned, file_id:%d, pagenum:%d", frame->file_desc, frame->page.page_num);
-      continue;
-    }
+    // Force flush
+    // if (frame->pin_count > 0) {
+    //   LOG_WARN("The page has been pinned, file_id:%d, pagenum:%d", frame->file_desc, frame->page.page_num);
+    //   continue;
+    // }
     if (frame->dirty) {
       RC rc = flush_page(frame);
       if (rc != RC::SUCCESS) {
