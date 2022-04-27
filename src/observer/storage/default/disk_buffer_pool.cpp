@@ -721,10 +721,19 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool onl
       UncompressedBlock *data = (UncompressedBlock *)block;
       CompressedBlock *comp_data = (CompressedBlock *)comp_block;
 
+      // other
       memcpy(comp_data->other, data->other, sizeof(data->other));
+
+      // __trx
       comp_data->__trx == data->__trx;
+
+      // c1: same as idx
       if (idx == 0) {
         comp_page->meta.delta_start = data->c1;
+      }
+
+      // c2: delta
+      if (idx == 0) {
         comp_page->meta.c2_start = data->c2;
         last_c2 = data->c2;
       } else {
@@ -751,10 +760,16 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
     UncompressedBlock *data = (UncompressedBlock *)block;
     CompressedBlock *comp_data = (CompressedBlock *)comp_block;
 
+    // other
     memcpy(data->other, comp_data->other, sizeof(data->other));
+
+    // __trx
     data->__trx == comp_data->__trx;
+
+    // c1: same as idx
     data->c1 = comp_page->meta.delta_start + idx;
 
+    // c2: delta
     if (idx == 0) {
       data->c2 = comp_page->meta.c2_start;
       last_c2 = data->c2;
