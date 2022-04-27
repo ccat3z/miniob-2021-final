@@ -550,6 +550,32 @@ RC DiskBufferPool::purge_all_pages(BPFileHandle *file_handle)
 
 RC DiskBufferPool::flush_page(Frame *frame)
 {
+  if (frame->page.page_num < UNCOMPRESSED_PAGE_NUM) {
+    return flush_uncompressed_page(frame);
+  }
+
+  s64_t offset = UNCOMPRESSED_PAGE_NUM * sizeof(Page) +
+                 ((s64_t)frame->page.page_num - UNCOMPRESSED_PAGE_NUM) * sizeof(CompressedPage);
+  CompressedPage comp_page;
+  compress_page(&frame->page, &comp_page);
+
+  if (lseek(frame->file_desc, offset, SEEK_SET) == offset - 1) {
+    LOG_ERROR("Failed to flush page %lld of %d due to failed to seek %s.", offset, frame->file_desc, strerror(errno));
+    return RC::IOERR_SEEK;
+  }
+
+  if (write(frame->file_desc, &comp_page, sizeof(CompressedPage)) != sizeof(CompressedPage)) {
+    LOG_ERROR("Failed to flush page %lld of %d due to %s.", offset, frame->file_desc, strerror(errno));
+    return RC::IOERR_WRITE;
+  }
+  frame->dirty = false;
+  LOG_DEBUG("Flush block. file desc=%d, page num=%d", frame->file_desc, frame->page.page_num);
+
+  return RC::SUCCESS;
+}
+
+RC DiskBufferPool::flush_uncompressed_page(Frame *frame)
+{
   // The better way is use mmap the block into memory,
   // so it is easier to flush data to file.
 
@@ -635,6 +661,29 @@ RC DiskBufferPool::check_page_num(PageNum page_num, BPFileHandle *file_handle)
 
 RC DiskBufferPool::load_page(PageNum page_num, BPFileHandle *file_handle, Frame *frame)
 {
+  if (page_num < UNCOMPRESSED_PAGE_NUM) {
+    return load_uncompressed_page(page_num, file_handle, frame);
+  }
+
+  s64_t offset =
+      UNCOMPRESSED_PAGE_NUM * sizeof(Page) + ((s64_t)page_num - UNCOMPRESSED_PAGE_NUM) * sizeof(CompressedPage);
+  CompressedPage comp_page;
+  if (lseek(file_handle->file_desc, offset, SEEK_SET) == -1) {
+    LOG_ERROR(
+        "Failed to load page %s:%d, due to failed to lseek:%s.", file_handle->file_name, page_num, strerror(errno));
+
+    return RC::IOERR_SEEK;
+  }
+  if (read(file_handle->file_desc, &comp_page, sizeof(Page)) != sizeof(Page)) {
+    LOG_ERROR(
+        "Failed to load page %s:%d, due to failed to read data:%s.", file_handle->file_name, page_num, strerror(errno));
+    return RC::IOERR_READ;
+  }
+  return decompress_page(&frame->page, &comp_page);
+}
+
+RC DiskBufferPool::load_uncompressed_page(PageNum page_num, BPFileHandle *file_handle, Frame *frame)
+{
   s64_t offset = ((s64_t)page_num) * sizeof(Page);
   if (lseek(file_handle->file_desc, offset, SEEK_SET) == -1) {
     LOG_ERROR(
@@ -647,5 +696,21 @@ RC DiskBufferPool::load_page(PageNum page_num, BPFileHandle *file_handle, Frame 
         "Failed to load page %s:%d, due to failed to read data:%s.", file_handle->file_name, page_num, strerror(errno));
     return RC::IOERR_READ;
   }
+  return RC::SUCCESS;
+}
+
+RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page)
+{
+  comp_page->page_num = page->page_num;
+  memcpy(comp_page->data, page->data, BP_PAGE_DATA_SIZE);
+  page->data[0]++;
+  return RC::SUCCESS;
+}
+
+RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
+{
+  page->page_num = comp_page->page_num;
+  memcpy(page->data, comp_page->data, BP_PAGE_DATA_SIZE);
+  page->data[0]--;
   return RC::SUCCESS;
 }

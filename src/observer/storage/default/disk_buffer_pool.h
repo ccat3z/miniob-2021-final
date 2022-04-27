@@ -32,15 +32,22 @@ typedef int PageNum;
 #define BP_INVALID_PAGE_NUM (-1)
 #define BP_PAGE_SIZE (1 << 17)
 #define BP_PAGE_DATA_SIZE (BP_PAGE_SIZE - sizeof(PageNum))
+#define BP_PAGE_COMPRESSED_SIZE (BP_PAGE_SIZE - sizeof(PageNum))
 #define BP_FILE_SUB_HDR_SIZE (sizeof(BPFileSubHeader))
 #define BP_BUFFER_SIZE 256
 #define MAX_OPEN_FILE 1024
+#define UNCOMPRESSED_PAGE_NUM 1
 
 typedef struct {
   PageNum page_num;
   char data[BP_PAGE_DATA_SIZE];
 } Page;
 // sizeof(Page) should be equal to BP_PAGE_SIZE
+
+typedef struct {
+  PageNum page_num;
+  char data[BP_PAGE_COMPRESSED_SIZE];
+} CompressedPage;
 
 typedef struct {
   PageNum page_count;
@@ -220,6 +227,10 @@ private:
   std::map<int, BPDisposedPages> disposed_pages;
 
   static int POOL_NUM;
+  RC load_uncompressed_page(PageNum page_num, BPFileHandle *file_handle, Frame *frame);
+  RC flush_uncompressed_page(Frame *frame);
+  RC compress_page(Page *page, CompressedPage *comp_page);
+  RC decompress_page(Page *page, CompressedPage *comp_page);
 };
 
 DiskBufferPool *theGlobalDiskBufferPool();
