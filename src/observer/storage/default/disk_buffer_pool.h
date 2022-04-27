@@ -32,7 +32,6 @@ typedef int PageNum;
 #define BP_INVALID_PAGE_NUM (-1)
 #define BP_PAGE_SIZE (1 << 17)
 #define BP_PAGE_DATA_SIZE (BP_PAGE_SIZE - sizeof(PageNum))
-#define BP_PAGE_COMPRESSED_SIZE (BP_PAGE_SIZE - sizeof(PageNum))
 #define BP_FILE_SUB_HDR_SIZE (sizeof(BPFileSubHeader))
 #define BP_BUFFER_SIZE 256
 #define MAX_OPEN_FILE 1024
@@ -40,7 +39,10 @@ typedef int PageNum;
 
 #define PAGE_FIRST_BLOCK_OFFSET 312
 #define PAGE_BLOCK_SIZE 56
-#define PAGE_COMPRESSED_BLOCK_SIZE 52
+#define PAGE_COMPRESSED_BLOCK_SIZE 56
+#define BP_PAGE_COMPRESSED_SIZE                                                            \
+  (BP_PAGE_DATA_SIZE - ((BP_PAGE_DATA_SIZE - PAGE_FIRST_BLOCK_OFFSET) / PAGE_BLOCK_SIZE) * \
+                           (PAGE_BLOCK_SIZE - PAGE_COMPRESSED_BLOCK_SIZE))
 
 typedef struct {
   PageNum page_num;
@@ -49,8 +51,12 @@ typedef struct {
 // sizeof(Page) should be equal to BP_PAGE_SIZE
 
 typedef struct {
-  PageNum page_num;
   int delta_start;
+} CompressedMeta;
+
+typedef struct {
+  PageNum page_num;
+  CompressedMeta meta;
   char data[BP_PAGE_COMPRESSED_SIZE];
 } CompressedPage;
 
