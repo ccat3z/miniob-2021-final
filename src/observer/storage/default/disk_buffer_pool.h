@@ -59,14 +59,32 @@ typedef struct {
   int __trx;
   int c1;
   int c2;
-  char other[PAGE_BLOCK_SIZE - sizeof(int) * 3];
+  int c3;
+  char v1[4];
+  char v2[4];
+  char v3[4];
+  char v4[4];
+  char v5[4];
+  char v6[4];
+  char v7[4];
+  char v8[4];
+  char v9[4];
 } UncompressedBlock;
 
 #pragma pack(1)
 typedef struct {
   int __trx;
   bool inc_c2;
-  char other[PAGE_BLOCK_SIZE - sizeof(int) * 3];
+  int c3;
+  char v1[4];
+  char v2[4];
+  char v3[4];
+  char v4[4];
+  char v5[4];
+  char v6[4];
+  char v7[4];
+  char v8[4];
+  char v9[4];
 } CompressedBlock;
 #pragma pack()
 
