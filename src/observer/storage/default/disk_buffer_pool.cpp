@@ -830,7 +830,7 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
 
     // v6
     memcpy(data->v6, comp_data->v6, sizeof(comp_data->v6));
-    data->v6[4] = 0;
+    data->v6[3] = 0;
 
     // v7
     memcpy(data->v7, comp_data->v7, sizeof(comp_data->v7));
