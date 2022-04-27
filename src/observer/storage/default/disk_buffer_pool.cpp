@@ -743,31 +743,31 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool onl
       comp_data->c3 = data->c3;
 
       // v1
-      memcpy(comp_data->v1, data->v1, sizeof(data->v1));
+      memcpy(comp_data->v1, data->v1, sizeof(comp_data->v1));
 
       // v2
-      memcpy(comp_data->v2, data->v2, sizeof(data->v2));
+      memcpy(comp_data->v2, data->v2, sizeof(comp_data->v2));
 
       // v3
-      memcpy(comp_data->v3, data->v3, sizeof(data->v3));
+      memcpy(comp_data->v3, data->v3, sizeof(comp_data->v3));
 
       // v4
-      memcpy(comp_data->v4, data->v4, sizeof(data->v4));
+      memcpy(comp_data->v4, data->v4, sizeof(comp_data->v4));
 
       // v5
-      memcpy(comp_data->v5, data->v5, sizeof(data->v5));
+      memcpy(comp_data->v5, data->v5, sizeof(comp_data->v5));
 
       // v6
-      memcpy(comp_data->v6, data->v6, sizeof(data->v6));
+      memcpy(comp_data->v6, data->v6, sizeof(comp_data->v6));
 
       // v7
-      memcpy(comp_data->v7, data->v7, sizeof(data->v7));
+      memcpy(comp_data->v7, data->v7, sizeof(comp_data->v7));
 
       // v8
-      memcpy(comp_data->v8, data->v8, sizeof(data->v8));
+      memcpy(comp_data->v8, data->v8, sizeof(comp_data->v8));
 
       // v9
-      memcpy(comp_data->v9, data->v9, sizeof(data->v9));
+      memcpy(comp_data->v9, data->v9, sizeof(comp_data->v9));
     }
   }
   return RC::SUCCESS;
@@ -808,31 +808,40 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
     data->c3 = comp_data->c3;
 
     // v1
-    memcpy(data->v1, comp_data->v1, sizeof(data->v1));
+    memcpy(data->v1, comp_data->v1, sizeof(comp_data->v1));
+    data->v1[4] = 0;
 
     // v2
-    memcpy(data->v2, comp_data->v2, sizeof(data->v2));
+    memcpy(data->v2, comp_data->v2, sizeof(comp_data->v2));
+    data->v2[4] = 0;
 
     // v3
-    memcpy(data->v3, comp_data->v3, sizeof(data->v3));
+    memcpy(data->v3, comp_data->v3, sizeof(comp_data->v3));
+    data->v3[4] = 0;
 
     // v4
-    memcpy(data->v4, comp_data->v4, sizeof(data->v4));
+    memcpy(data->v4, comp_data->v4, sizeof(comp_data->v4));
+    data->v4[4] = 0;
 
     // v5
-    memcpy(data->v5, comp_data->v5, sizeof(data->v5));
+    memcpy(data->v5, comp_data->v5, sizeof(comp_data->v5));
+    data->v5[4] = 0;
 
     // v6
-    memcpy(data->v6, comp_data->v6, sizeof(data->v6));
+    memcpy(data->v6, comp_data->v6, sizeof(comp_data->v6));
+    data->v6[4] = 0;
 
     // v7
-    memcpy(data->v7, comp_data->v7, sizeof(data->v7));
+    memcpy(data->v7, comp_data->v7, sizeof(comp_data->v7));
+    data->v7[4] = 0;
 
     // v8
-    memcpy(data->v8, comp_data->v8, sizeof(data->v8));
+    memcpy(data->v8, comp_data->v8, sizeof(comp_data->v8));
+    data->v8[4] = 0;
 
     // v9
-    memcpy(data->v9, comp_data->v9, sizeof(data->v9));
+    memcpy(data->v9, comp_data->v9, sizeof(comp_data->v9));
+    data->v9[4] = 0;
   }
   return RC::SUCCESS;
 }

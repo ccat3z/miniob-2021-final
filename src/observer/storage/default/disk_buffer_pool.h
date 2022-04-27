@@ -76,15 +76,15 @@ typedef struct {
   int __trx;
   bool inc_c2;
   int c3;
-  char v1[4];
-  char v2[4];
-  char v3[4];
-  char v4[4];
-  char v5[4];
-  char v6[4];
-  char v7[4];
-  char v8[4];
-  char v9[4];
+  char v1[3];
+  char v2[3];
+  char v3[3];
+  char v4[3];
+  char v5[3];
+  char v6[3];
+  char v7[3];
+  char v8[3];
+  char v9[3];
 } CompressedBlock;
 #pragma pack()
 
