@@ -242,7 +242,7 @@ private:
   static int POOL_NUM;
   RC load_uncompressed_page(PageNum page_num, BPFileHandle *file_handle, Frame *frame);
   RC flush_uncompressed_page(Frame *frame);
-  RC compress_page(Page *page, CompressedPage *comp_page);
+  RC compress_page(Page *page, CompressedPage *comp_page, bool only_meta);
   RC decompress_page(Page *page, CompressedPage *comp_page);
 };
 

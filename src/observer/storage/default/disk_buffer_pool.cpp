@@ -368,11 +368,11 @@ RC DiskBufferPool::allocate_page(int file_id, BPPageHandle *page_handle)
   page_handle->frame->page.page_num = file_handle->file_sub_header->page_count - 1;
 
   // Use flush operation to extension file
-  // if ((tmp = flush_page(page_handle->frame)) != RC::SUCCESS) {
-  //   LOG_WARN("Failed to alloc page %s , due to failed to extend one page.", file_handle->file_name);
-  //   // skip return false, delay flush the extended page
-  //   // return tmp;
-  // }
+  if ((tmp = flush_page(page_handle->frame)) != RC::SUCCESS) {
+    LOG_WARN("Failed to alloc page %s , due to failed to extend one page.", file_handle->file_name);
+    // skip return false, delay flush the extended page
+    // return tmp;
+  }
 
   page_handle->open = true;
   return RC::SUCCESS;
@@ -562,7 +562,7 @@ RC DiskBufferPool::flush_page(Frame *frame)
   s64_t offset = UNCOMPRESSED_PAGE_NUM * sizeof(Page) +
                  ((s64_t)frame->page.page_num - UNCOMPRESSED_PAGE_NUM) * sizeof(CompressedPage);
   CompressedPage comp_page;
-  compress_page(&frame->page, &comp_page);
+  compress_page(&frame->page, &comp_page, !frame->dirty);
 
   if (lseek(frame->file_desc, offset, SEEK_SET) == offset - 1) {
     LOG_ERROR("Failed to flush page %lld of %d due to failed to seek %s.", offset, frame->file_desc, strerror(errno));
@@ -704,7 +704,7 @@ RC DiskBufferPool::load_uncompressed_page(PageNum page_num, BPFileHandle *file_h
   return RC::SUCCESS;
 }
 
-RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page)
+RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool only_meta)
 {
   comp_page->page_num = page->page_num;
   memcpy(comp_page->data, page->data, PAGE_FIRST_BLOCK_OFFSET);
@@ -714,8 +714,12 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page)
   char *comp_block = comp_page->data + PAGE_FIRST_BLOCK_OFFSET;
 
   for (int idx = 0; idx < blocks_cap; block += PAGE_BLOCK_SIZE, comp_block += PAGE_COMPRESSED_BLOCK_SIZE, ++idx) {
-    memcpy(comp_block, block, PAGE_COMPRESSED_BLOCK_SIZE);
-    comp_block[0]++;  // compress demo
+    if (only_meta) {
+      memcpy(comp_block, block, PAGE_COMPRESSED_BLOCK_SIZE);
+    } else {
+      memcpy(comp_block, block, PAGE_COMPRESSED_BLOCK_SIZE);
+      comp_block[4]++;  // compress demo
+    }
   }
   return RC::SUCCESS;
 }
@@ -731,7 +735,7 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
 
   for (int idx = 0; idx < blocks_cap; block += PAGE_BLOCK_SIZE, comp_block += PAGE_COMPRESSED_BLOCK_SIZE, ++idx) {
     memcpy(block, comp_block, PAGE_COMPRESSED_BLOCK_SIZE);
-    block[0]--;  // compress demo
+    block[4]--;  // compress demo
   }
   return RC::SUCCESS;
 }
