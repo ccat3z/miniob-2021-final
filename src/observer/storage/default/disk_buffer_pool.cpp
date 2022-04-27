@@ -818,30 +818,30 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
 
     // v3
     memcpy(data->v3, comp_data->v3, sizeof(comp_data->v3));
-    data->v3[4] = 0;
+    data->v3[3] = 0;
 
     // v4
     memcpy(data->v4, comp_data->v4, sizeof(comp_data->v4));
-    data->v4[4] = 0;
+    data->v4[3] = 0;
 
     // v5
     memcpy(data->v5, comp_data->v5, sizeof(comp_data->v5));
-    data->v5[4] = 0;
+    data->v5[3] = 0;
 
     // v6: 0-999
     sprintf(data->v6, "%d", comp_data->v6);
 
     // v7
     memcpy(data->v7, comp_data->v7, sizeof(comp_data->v7));
-    data->v7[4] = 0;
+    data->v7[3] = 0;
 
     // v8
     memcpy(data->v8, comp_data->v8, sizeof(comp_data->v8));
-    data->v8[4] = 0;
+    data->v8[3] = 0;
 
     // v9
     memcpy(data->v9, comp_data->v9, sizeof(comp_data->v9));
-    data->v9[4] = 0;
+    data->v9[3] = 0;
   }
   return RC::SUCCESS;
 }
