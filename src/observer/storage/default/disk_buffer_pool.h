@@ -77,7 +77,7 @@ typedef struct {
   bool inc_c2;
   int c3;
   char v1[3];
-  char v2[3];
+  int16_t v2;
   char v3[3];
   char v4[3];
   char v5[3];
