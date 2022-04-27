@@ -712,6 +712,7 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool onl
 
   char *block = page->data + PAGE_FIRST_BLOCK_OFFSET;
   char *comp_block = comp_page->data + PAGE_FIRST_BLOCK_OFFSET;
+  int last_c2;
 
   for (int idx = 0; idx < blocks_cap; block += PAGE_BLOCK_SIZE, comp_block += PAGE_COMPRESSED_BLOCK_SIZE, ++idx) {
     if (only_meta) {
@@ -724,6 +725,12 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool onl
       comp_data->__trx == data->__trx;
       if (idx == 0) {
         comp_page->meta.delta_start = data->c1;
+        comp_page->meta.c2_start = data->c2;
+        last_c2 = data->c2;
+      } else {
+        if (comp_data->inc_c2 = (data->c2 != last_c2)) {
+          ++last_c2;
+        }
       }
     }
   }
@@ -738,6 +745,7 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
 
   char *block = page->data + PAGE_FIRST_BLOCK_OFFSET;
   char *comp_block = comp_page->data + PAGE_FIRST_BLOCK_OFFSET;
+  int last_c2;
 
   for (int idx = 0; idx < blocks_cap; block += PAGE_BLOCK_SIZE, comp_block += PAGE_COMPRESSED_BLOCK_SIZE, ++idx) {
     UncompressedBlock *data = (UncompressedBlock *)block;
@@ -746,6 +754,16 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
     memcpy(data->other, comp_data->other, sizeof(data->other));
     data->__trx == comp_data->__trx;
     data->c1 = comp_page->meta.delta_start + idx;
+
+    if (idx == 0) {
+      data->c2 = comp_page->meta.c2_start;
+      last_c2 = data->c2;
+    } else {
+      if (comp_data->inc_c2) {
+        ++last_c2;
+      }
+      data->c2 = last_c2;
+    }
   }
   return RC::SUCCESS;
 }

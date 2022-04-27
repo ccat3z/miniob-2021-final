@@ -52,18 +52,23 @@ typedef struct {
 
 typedef struct {
   int delta_start;
+  int c2_start;
 } CompressedMeta;
 
 typedef struct {
   int __trx;
   int c1;
-  char other[PAGE_BLOCK_SIZE - sizeof(int) * 2];
+  int c2;
+  char other[PAGE_BLOCK_SIZE - sizeof(int) * 3];
 } UncompressedBlock;
 
+#pragma pack(1)
 typedef struct {
   int __trx;
-  char other[PAGE_BLOCK_SIZE - sizeof(int) * 2];
+  bool inc_c2;
+  char other[PAGE_BLOCK_SIZE - sizeof(int) * 3];
 } CompressedBlock;
+#pragma pack()
 
 typedef struct {
   PageNum page_num;
