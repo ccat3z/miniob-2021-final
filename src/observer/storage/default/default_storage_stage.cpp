@@ -205,7 +205,8 @@ void DefaultStorageStage::handle_event(StageEvent *event)
       rc = handler_->create_index(
           current_trx, current_db, create_index.relation_name, create_index.index_name, create_index.attribute_name);
       snprintf(response, sizeof(response), "%s\n", rc == RC::SUCCESS ? "SUCCESS" : "FAILURE");
-      // Force sync after create index
+      // 由于compress_page和decompress_page只能在flush时触发,
+      // 为了能够在测试平台验证此处功能, 在这里强制触发一次sync
       DefaultHandler::get_default().sync();
     } break;
 
