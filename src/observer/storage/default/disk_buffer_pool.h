@@ -81,7 +81,7 @@ typedef struct {
   char v3[3];
   char v4[3];
   char v5[3];
-  char v6[3];
+  int16_t v6;
   char v7[3];
   char v8[3];
   char v9[3];
