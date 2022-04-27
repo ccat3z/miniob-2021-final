@@ -40,7 +40,7 @@ typedef int PageNum;
 
 #define PAGE_FIRST_BLOCK_OFFSET 312
 #define PAGE_BLOCK_SIZE 56
-#define PAGE_COMPRESSED_BLOCK_SIZE 56
+#define PAGE_COMPRESSED_BLOCK_SIZE 52
 
 typedef struct {
   PageNum page_num;
