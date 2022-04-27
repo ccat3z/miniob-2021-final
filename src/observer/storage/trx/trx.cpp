@@ -107,6 +107,10 @@ void Trx::get_record_trx_id(Table *table, const Record &record, int32_t &trx_id,
   int32_t trx = *(int32_t *)(record.data + trx_field->offset());
   trx_id = trx & TRX_ID_BIT_MASK;
   deleted = (trx & DELETED_FLAG_BIT_MASK) != 0;
+
+  // Disable broken trx
+  trx_id = 0;
+  deleted = false;
 }
 
 Operation *Trx::find_operation(Table *table, const RID &rid)
