@@ -709,32 +709,32 @@ inline void encode_9vischar(uint64_t &v, char *a, char *b, char *c)
   v = 0;
   for (int i = 2; i >= 0; --i) {
     v *= 95;
-    v += c[i] - '!';
+    v += c[i] - ' ';
   }
   for (int i = 2; i >= 0; --i) {
     v *= 95;
-    v += b[i] - '!';
+    v += b[i] - ' ';
   }
   for (int i = 2; i >= 0; --i) {
     v *= 95;
-    v += a[i] - '!';
+    v += a[i] - ' ';
   }
 }
 
 inline void decode_9vischar(uint64_t &v, char *a, char *b, char *c)
 {
   for (int i = 0; i < 3; ++i) {
-    a[i] = (v % 95) + '!';
+    a[i] = (v % 95) + ' ';
     v /= 95;
   }
   a[3] = 0;
   for (int i = 0; i < 3; ++i) {
-    b[i] = (v % 95) + '!';
+    b[i] = (v % 95) + ' ';
     v /= 95;
   }
   b[3] = 0;
   for (int i = 0; i < 3; ++i) {
-    c[i] = (v % 95) + '!';
+    c[i] = (v % 95) + ' ';
     v /= 95;
   }
   c[3] = 0;
