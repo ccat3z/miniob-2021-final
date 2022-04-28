@@ -721,7 +721,7 @@ inline void encode_9vischar(uint64_t &v, char *a, char *b, char *c)
   }
 }
 
-inline void dencode_9vischar(uint64_t &v, char *a, char *b, char *c)
+inline void decode_9vischar(uint64_t &v, char *a, char *b, char *c)
 {
   for (int i = 0; i < 3; ++i) {
     a[i] = (v % 95) + '!';
