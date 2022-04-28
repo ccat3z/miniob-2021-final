@@ -764,12 +764,8 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool onl
       // v5
       memcpy(comp_data->v5, data->v5, sizeof(comp_data->v5));
 
-      // v6: <= 1000
-      comp_data->v6 = 0;
-      for (int i = 0; i < 4 && data->v6[i] != 0; i++) {
-        comp_data->v6 *= 10;
-        comp_data->v6 += data->v6[i] - '0';
-      }
+      // v6
+      memcpy(comp_data->v6, data->v6, sizeof(comp_data->v6));
 
       // v7
       memcpy(comp_data->v7, data->v7, sizeof(comp_data->v7));
@@ -839,21 +835,9 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
     memcpy(data->v5, comp_data->v5, sizeof(comp_data->v5));
     data->v5[3] = 0;
 
-    // v6: <= 1000
-    int num = comp_data->v6;
-    int num_loc = 0;
-    int num_pow = 100;
-    for (; num_pow > 0; num_pow /= 10) {
-      if (num / num_pow != 0)
-        break;
-    }
-    for (; num_pow > 0; num_pow /= 10) {
-      data->v6[num_loc++] = num / num_pow + '0';
-      num %= num_pow;
-    }
-    for (; num_loc < 4; num_loc++) {
-      data->v6[num_loc] = 0;
-    }
+    // v6
+    memcpy(data->v6, comp_data->v6, sizeof(comp_data->v6));
+    data->v6[3] = 0;
 
     // v7
     memcpy(data->v7, comp_data->v7, sizeof(comp_data->v7));
