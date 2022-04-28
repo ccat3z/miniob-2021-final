@@ -801,7 +801,8 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool onl
       }
 
       // c3
-      comp_data->c3 = data->c3;
+      comp_data->c3_high = data->c3 / (1 << 16);
+      comp_data->c3_low = data->c3 % (1 << 16);
 
       // v1
       memcpy(comp_data->v1, data->v1, sizeof(comp_data->v1));
@@ -854,7 +855,7 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
     }
 
     // c3
-    data->c3 = comp_data->c3;
+    data->c3 = (((uint32_t)comp_data->c3_high) * (1 << 16)) + (uint32_t)comp_data->c3_low;
 
     // v1
     memcpy(data->v1, comp_data->v1, sizeof(comp_data->v1));

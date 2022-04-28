@@ -60,7 +60,7 @@ typedef struct {
   int __trx;
   int c1;
   int c2;
-  int c3;
+  uint32_t c3;
   char v1[4];
   char v2[4];
   char v3[4];
@@ -76,7 +76,8 @@ typedef struct {
 typedef struct {
   int __trx;
   bool inc_c2;
-  int c3;
+  uint8_t c3_high;
+  uint16_t c3_low;
   char v1[3];
   int16_t v2;
   uint64_t v345;
