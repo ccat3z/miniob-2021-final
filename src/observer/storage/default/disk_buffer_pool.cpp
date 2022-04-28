@@ -704,6 +704,42 @@ RC DiskBufferPool::load_uncompressed_page(PageNum page_num, BPFileHandle *file_h
   return RC::SUCCESS;
 }
 
+inline void encode_9vischar(uint64_t &v, char *a, char *b, char *c)
+{
+  v = 0;
+  for (int i = 2; i >= 0; --i) {
+    v *= 95;
+    v += c[i] - '!';
+  }
+  for (int i = 2; i >= 0; --i) {
+    v *= 95;
+    v += b[i] - '!';
+  }
+  for (int i = 2; i >= 0; --i) {
+    v *= 95;
+    v += a[i] - '!';
+  }
+}
+
+inline void dencode_9vischar(uint64_t &v, char *a, char *b, char *c)
+{
+  for (int i = 0; i < 3; ++i) {
+    a[i] = (v % 95) + '!';
+    v /= 95;
+  }
+  a[3] = 0;
+  for (int i = 0; i < 3; ++i) {
+    b[i] = (v % 95) + '!';
+    v /= 95;
+  }
+  b[3] = 0;
+  for (int i = 0; i < 3; ++i) {
+    c[i] = (v % 95) + '!';
+    v /= 95;
+  }
+  c[3] = 0;
+}
+
 // NOTE
 // 由于compress_page和decompress_page只能在flush时触发,
 // 为了能够在测试平台验证此处功能, 我在create index后强制触发了一次sync.
@@ -755,26 +791,14 @@ RC DiskBufferPool::compress_page(Page *page, CompressedPage *comp_page, bool onl
       // v2: AA
       comp_data->v2 = (data->v2[0] - 'A') * 26 + (data->v2[1] - 'A');
 
-      // v3
-      memcpy(comp_data->v3, data->v3, sizeof(comp_data->v3));
-
-      // v4
-      memcpy(comp_data->v4, data->v4, sizeof(comp_data->v4));
-
-      // v5
-      memcpy(comp_data->v5, data->v5, sizeof(comp_data->v5));
+      // v3 - v5
+      encode_9vischar(comp_data->v345, data->v3, data->v4, data->v5);
 
       // v6
       memcpy(comp_data->v6, data->v6, sizeof(comp_data->v6));
 
-      // v7
-      memcpy(comp_data->v7, data->v7, sizeof(comp_data->v7));
-
-      // v8
-      memcpy(comp_data->v8, data->v8, sizeof(comp_data->v8));
-
-      // v9
-      memcpy(comp_data->v9, data->v9, sizeof(comp_data->v9));
+      // v7 - v9
+      encode_9vischar(comp_data->v789, data->v7, data->v8, data->v9);
     }
   }
   return RC::SUCCESS;
@@ -823,33 +847,15 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
     data->v2[1] = comp_data->v2 % 26 + 'A';
     data->v2[2] = 0;
 
-    // v3
-    memcpy(data->v3, comp_data->v3, sizeof(comp_data->v3));
-    data->v3[3] = 0;
-
-    // v4
-    memcpy(data->v4, comp_data->v4, sizeof(comp_data->v4));
-    data->v4[3] = 0;
-
-    // v5
-    memcpy(data->v5, comp_data->v5, sizeof(comp_data->v5));
-    data->v5[3] = 0;
+    // v3 - v5
+    decode_9vischar(comp_data->v345, data->v3, data->v4, data->v5);
 
     // v6
     memcpy(data->v6, comp_data->v6, sizeof(comp_data->v6));
     data->v6[3] = 0;
 
-    // v7
-    memcpy(data->v7, comp_data->v7, sizeof(comp_data->v7));
-    data->v7[3] = 0;
-
-    // v8
-    memcpy(data->v8, comp_data->v8, sizeof(comp_data->v8));
-    data->v8[3] = 0;
-
-    // v9
-    memcpy(data->v9, comp_data->v9, sizeof(comp_data->v9));
-    data->v9[3] = 0;
+    // v7 - v9
+    decode_9vischar(comp_data->v789, data->v7, data->v8, data->v9);
   }
   return RC::SUCCESS;
 }

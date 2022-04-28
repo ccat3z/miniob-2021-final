@@ -79,13 +79,9 @@ typedef struct {
   int c3;
   char v1[3];
   int16_t v2;
-  char v3[3];
-  char v4[3];
-  char v5[3];
+  uint64_t v345;
   char v6[3];
-  char v7[3];
-  char v8[3];
-  char v9[3];
+  uint64_t v789;
 } CompressedBlock;
 #pragma pack()
 
