@@ -708,34 +708,52 @@ inline void encode_9vischar(uint64_t &v, char *a, char *b, char *c)
 {
   v = 0;
   for (int i = 2; i >= 0; --i) {
-    v *= 95;
-    v += c[i] - ' ';
+    v *= 96;
+    if (c[i] == 0) {
+      v += 95;
+    } else {
+      v += c[i] - ' ';
+    }
   }
   for (int i = 2; i >= 0; --i) {
-    v *= 95;
-    v += b[i] - ' ';
+    v *= 96;
+    if (b[i] == 0) {
+      v += 95;
+    } else {
+      v += b[i] - ' ';
+    }
   }
   for (int i = 2; i >= 0; --i) {
-    v *= 95;
-    v += a[i] - ' ';
+    v *= 96;
+    if (a[i] == 0) {
+      v += 95;
+    } else {
+      v += a[i] - ' ';
+    }
   }
 }
 
 inline void decode_9vischar(uint64_t &v, char *a, char *b, char *c)
 {
   for (int i = 0; i < 3; ++i) {
-    a[i] = (v % 95) + ' ';
-    v /= 95;
+    a[i] = (v % 96) + ' ';
+    if (a[i] == 127)
+      a[i] = 0;
+    v /= 96;
   }
   a[3] = 0;
   for (int i = 0; i < 3; ++i) {
-    b[i] = (v % 95) + ' ';
-    v /= 95;
+    b[i] = (v % 96) + ' ';
+    if (b[i] == 127)
+      b[i] = 0;
+    v /= 96;
   }
   b[3] = 0;
   for (int i = 0; i < 3; ++i) {
-    c[i] = (v % 95) + ' ';
-    v /= 95;
+    c[i] = (v % 96) + ' ';
+    if (c[i] == 127)
+      c[i] = 0;
+    v /= 96;
   }
   c[3] = 0;
 }
