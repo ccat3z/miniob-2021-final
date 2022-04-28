@@ -843,10 +843,10 @@ RC DiskBufferPool::decompress_page(Page *page, CompressedPage *comp_page)
     int num = comp_data->v6;
     int num_loc = 0;
     int num_pow = 100;
-    for (; num_pow > 0; num_pow /= 10) {
-      if (num / num_pow != 0)
-        break;
-    }
+    // for (; num_pow > 0; num_pow /= 10) {
+    //   if (num / num_pow != 0)
+    //     break;
+    // }
     for (; num_pow > 0; num_pow /= 10) {
       data->v6[num_loc++] = num / num_pow + '0';
       num %= num_pow;
